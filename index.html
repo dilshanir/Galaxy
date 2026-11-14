@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Galaxy — Couture for the Cosmos</title>
+<meta name="description" content="Galaxy: fully 3D celestial couture characters, woven from nebulae and starlight.">
+<meta name="theme-color" content="#07061a">
+
+<link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+
+<style>
+/* ============ FONTS ============ */
+@font-face {
+  font-family: "Archivo";
+  src: url("fonts/archivo-latin.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Outfit";
+  src: url("fonts/outfit-latin.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============ TOKENS ============ */
+:root {
+  --bg: #07061a;
+  --ink: #f4efe6;
+  --mute: #8f8aa8;
+  --pill: rgba(255,255,255,.08);
+  --line: rgba(244,239,230,.16);
+  --accent: #ffc857;
+  --aurora: linear-gradient(120deg,#7c5cff,#ff6ad5,#2de2c8);
+
+  /* Scaling system. --vw is set by JS: clientWidth / 1440 (a plain number).
+     u = frame unit, n = nav/footer unit. Use calc(53 * var(--u)) etc. */
+  --vw: 1;
+  --u: calc(var(--vw) * 1px);
+  --n: min(calc(var(--vw) * 1px), calc(100svh / 760));
+}
+@media (max-width: 820px) {
+  :root {
+    --u: calc(100vw / 390);
+    --n: calc(100vw / 390);
+  }
+}
+
+/* ============ BASE ============ */
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--bg); color-scheme: dark; }
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Archivo", system-ui, sans-serif;
+  font-stretch: 112%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; }
+
+/* ============ GLOBAL LAYERS ============ */
+
+/* Nebula glow: behind content, slowly breathing */
+.nebula {
+  position: fixed;
+  inset: -10vmax;
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(80px);
+  background:
+    radial-gradient(40% 36% at 22% 30%, rgba(124,92,255,.12), transparent 70%),
+    radial-gradient(42% 38% at 78% 68%, rgba(255,106,213,.12), transparent 70%),
+    radial-gradient(30% 30% at 60% 20%, rgba(45,226,200,.06), transparent 70%);
+  animation: breathe 14s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% { opacity: .55; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.08); }
+}
+
+/* Vignette */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 59;
+  pointer-events: none;
+  box-shadow: inset 0 0 240px 20px rgba(0,0,12,.55);
+}
+
+/* Star dust: two tiles drifting diagonally at different speeds (parallax).
+   Tiles are feTurbulence fractalNoise thresholded through feColorMatrix. */
+.stardust, .stardust--far {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background-repeat: repeat;
+}
+.stardust {
+  opacity: .5;
+  background-size: 240px 240px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='1' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .96 0 0 0 0 .94 0 0 0 0 .9 22 0 0 0 -15.6'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23f)'/%3E%3C/svg%3E");
+  animation: drift 40s linear infinite;
+}
+.stardust--far {
+  opacity: .32;
+  background-size: 360px 360px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.42' numOctaves='1' seed='23' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .86 0 0 0 0 .6 26 0 0 0 -19.2'/%3E%3C/filter%3E%3Crect width='360' height='360' filter='url(%23g)'/%3E%3C/svg%3E");
+  animation: drift-far 90s linear infinite;
+}
+/* The tile sizes match the translation distance, so the loop is seamless. */
+@keyframes drift     { to { background-position: 240px 240px; } }
+@keyframes drift-far { to { background-position: -360px 360px; } }
+
+/* ============ STEP 1 SCAFFOLD (temporary; replaced in step 3) ============ */
+.scaffold {
+  position: relative;
+  z-index: 1;
+  min-height: 100svh;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding: 0 16px;
+}
+.scaffold h1 {
+  margin: 0;
+  font-weight: 650;
+  font-size: calc(177 * var(--u));
+  line-height: 1;
+}
+.scaffold p {
+  margin: 12px 0 0;
+  font-size: calc(14.5 * var(--n));
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.scaffold .gold { color: var(--accent); }
+.scaffold .logo-test {
+  margin-top: 24px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: calc(30 * var(--n));
+}
+
+/* ============ STEP 2: SHARED PILL / FOCUS ============ */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(12 * var(--n));
+  height: calc(50 * var(--n));
+  padding: 0 calc(9 * var(--n)) 0 calc(20 * var(--n));
+  border-radius: 999px;
+  background: var(--pill);
+  border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font-size: calc(13 * var(--n));
+  font-weight: 650;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: opacity .5s, transform .6s cubic-bezier(.16,1,.3,1), background-color .3s;
+}
+.pill:hover { background-color: rgba(255,255,255,.13); }
+.pill__dot {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: calc(32 * var(--n));
+  height: calc(32 * var(--n));
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg);
+  transition: transform .6s cubic-bezier(.16,1,.3,1);
+}
+.pill:hover .pill__dot { transform: rotate(90deg); background: var(--aurora); }
+.pill__dot svg { width: calc(12 * var(--n)); height: calc(12 * var(--n)); display: block; }
+
+/* ============ STEP 2: TOP NAV ============ */
+.nav {
+  position: fixed;
+  z-index: 40;
+  top: 0; left: 0; right: 0;
+  height: calc(66 * var(--n));
+  pointer-events: none;
+}
+.nav > * { pointer-events: auto; }
+.nav .pill, .nav__label, .logo, .menu-btn { position: absolute; }
+.pill--watch { left: calc(53 * var(--n)); top: calc(8 * var(--n)); width: calc(178 * var(--n)); }
+.pill--enter { right: calc(127 * var(--n)); top: calc(8 * var(--n)); }
+.nav__label {
+  left: calc(463 * var(--n));
+  top: calc(22 * var(--n));
+  font-size: calc(14.5 * var(--n));
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: opacity .5s, transform .6s cubic-bezier(.16,1,.3,1);
+}
+.logo {
+  left: calc(53 * var(--n));
+  top: calc(18 * var(--n));
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: calc(30 * var(--n));
+  line-height: 1;
+  opacity: 0;
+  transform: translateY(calc(10 * var(--n)));
+  pointer-events: none !important;
+  transition: opacity .5s, transform .6s cubic-bezier(.16,1,.3,1);
+}
+body.scrolled .logo { opacity: 1; transform: none; pointer-events: auto !important; }
+body.scrolled .nav .pill,
+body.scrolled .nav__label {
+  opacity: 0;
+  transform: translateY(calc(-14 * var(--n)));
+  pointer-events: none;
+}
+
+.menu-btn {
+  right: calc(55 * var(--n));
+  top: calc(8 * var(--n));
+  width: calc(50 * var(--n));
+  height: calc(50 * var(--n));
+  padding: 0;
+  border-radius: 50%;
+  background: var(--pill);
+  border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+.menu-btn span {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: calc(18 * var(--n));
+  height: calc(2 * var(--n));
+  margin: calc(-1 * var(--n)) 0 0 calc(-9 * var(--n));
+  background: var(--ink);
+  border-radius: 2px;
+  transition: transform .5s cubic-bezier(.16,1,.3,1), opacity .3s;
+}
+.menu-btn span:nth-child(1) { transform: translateY(calc(-6 * var(--n))); }
+.menu-btn span:nth-child(3) { transform: translateY(calc(6 * var(--n))); }
+.menu-open .menu-btn span:nth-child(1) { transform: rotate(45deg); }
+.menu-open .menu-btn span:nth-child(2) { opacity: 0; }
+.menu-open .menu-btn span:nth-child(3) { transform: rotate(-45deg); }
+
+/* ============ STEP 2: MENU OVERLAY ============ */
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  display: grid;
+  align-content: center;
+  padding: 0 calc(53 * var(--n));
+  background: rgba(7,6,26,.88);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .5s, visibility 0s .5s;
+}
+.menu.open { opacity: 1; visibility: visible; transition: opacity .5s; }
+.menu a {
+  display: flex;
+  align-items: baseline;
+  gap: .3em;
+  width: fit-content;
+  max-width: 100%;
+  font-weight: 900;
+  font-stretch: 125%;
+  text-transform: uppercase;
+  font-size: max(40px, calc(88 * var(--n)));
+  line-height: 1.04;
+  opacity: 0;
+  transform: translateY(40%);
+  transition: color .3s;
+}
+.menu.open a {
+  opacity: 1;
+  transform: none;
+  transition: opacity .8s calc(var(--i) * 80ms + 120ms) cubic-bezier(.16,1,.3,1),
+              transform .9s calc(var(--i) * 80ms + 120ms) cubic-bezier(.16,1,.3,1),
+              color .3s;
+}
+.menu a:hover { color: var(--accent); }
+.menu__num { font-size: .18em; font-weight: 600; letter-spacing: .2em; color: var(--mute); }
+html.menu-open { overflow: hidden; }
+
+/* ============ STEP 2: BOTTOM BAR ============ */
+.bar {
+  position: fixed;
+  z-index: 40;
+  left: 0; right: 0;
+  bottom: calc(18 * var(--n));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(16 * var(--n));
+  padding: 0 calc(55 * var(--n)) 0 calc(53 * var(--n));
+  pointer-events: none;
+  transition: opacity .5s, transform .6s cubic-bezier(.16,1,.3,1), visibility 0s;
+}
+.bar > * { pointer-events: auto; }
+body.bar-off .bar {
+  opacity: 0;
+  transform: translateY(calc(24 * var(--n)));
+  visibility: hidden;
+  transition: opacity .5s, transform .6s cubic-bezier(.16,1,.3,1), visibility 0s .5s;
+}
+body.bar-off .bar > * { pointer-events: none; }
+
+.pill--roadmap { height: calc(46 * var(--n)); padding-left: calc(10 * var(--n)); padding-right: calc(20 * var(--n)); }
+.pill--roadmap svg { width: calc(26 * var(--n)); height: calc(26 * var(--n)); flex: none; }
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: calc(46 * var(--n));
+  height: calc(46 * var(--n));
+  padding: 0;
+  border-radius: 50%;
+  background: var(--pill);
+  border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: transform .4s cubic-bezier(.16,1,.3,1), background-color .3s;
+}
+.icon-btn:hover { background-color: rgba(255,255,255,.13); transform: rotate(-8deg) scale(1.05); }
+.icon-btn svg { width: calc(26 * var(--n)); height: calc(26 * var(--n)); }
+
+.switch {
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--n));
+  font-size: calc(12 * var(--n));
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--mute);
+  white-space: nowrap;
+}
+.key {
+  padding: calc(9 * var(--n)) calc(18 * var(--n));
+  border: 0;
+  border-radius: calc(9 * var(--n));
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 850;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  font-size: calc(12 * var(--n));
+  cursor: pointer;
+  box-shadow: 0 calc(3 * var(--n)) 0 #a39c8d;
+  transition: transform .08s, box-shadow .08s;
+}
+.key:active, .key.is-pressed { transform: translateY(calc(3 * var(--n))); box-shadow: 0 0 0 #a39c8d; }
+
+.link-index {
+  position: relative;
+  padding-bottom: calc(3 * var(--n));
+  font-size: calc(13 * var(--n));
+  font-weight: 650;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.link-index::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform .5s cubic-bezier(.16,1,.3,1);
+}
+.link-index:hover::after { transform: scaleX(1); transform-origin: left; }
+
+.dots { display: flex; gap: calc(6 * var(--n)); }
+.dots i {
+  display: block;
+  width: calc(5 * var(--n));
+  height: calc(5 * var(--n));
+  border-radius: 50%;
+  background: var(--accent);
+  animation: blink 1.6s ease-in-out infinite;
+}
+.dots i:nth-child(2) { animation-delay: .2s; }
+.dots i:nth-child(3) { animation-delay: .4s; }
+.dots i:nth-child(4) { animation-delay: .6s; }
+.dots i:nth-child(5) { animation-delay: .8s; }
+@keyframes blink { 0%, 100% { opacity: .15; } 50% { opacity: 1; } }
+
+/* ============ STEP 2: PHONE ============ */
+@media (max-width: 820px) {
+  .nav__label, .pill--enter { display: none; }
+  .pill--watch { left: calc(16 * var(--n)); }
+  .logo { left: calc(16 * var(--n)); }
+  .menu-btn { right: calc(16 * var(--n)); }
+  .menu { padding: 0 calc(16 * var(--n)); }
+  .menu a { font-size: max(28px, 7.6vw); flex-direction: column; gap: .15em; overflow-wrap: anywhere; }
+  .bar { justify-content: flex-end; padding: 0 calc(16 * var(--n)); bottom: calc(16 * var(--n)); }
+  .bar > :not(.switch) { display: none; }
+  .switch > span { display: none; }
+}
+
+/* ============ STEP 2 TEMP STUBS (replaced by real sections later) ============ */
+.stub {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  border-top: 1px dashed var(--line);
+  color: var(--mute);
+  font-size: calc(14 * var(--n));
+  letter-spacing: .3em;
+  text-transform: uppercase;
+}
+#walk.stub { height: 300svh; align-content: start; padding-top: 40svh; }
+#partners.stub { height: 100svh; }
+
+/* ============ REDUCED MOTION ============ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="nebula" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="stardust--far" aria-hidden="true"></div>
+<div class="stardust" aria-hidden="true"></div>
+
+<!-- ============ TOP NAV ============ -->
+<header class="nav">
+  <a class="logo" href="#top" aria-label="Galaxy, back to top">Galaxy®</a>
+
+  <a class="pill pill--watch" href="#walk">
+    <span>Watch the film</span>
+    <span class="pill__dot" aria-hidden="true">
+      <svg viewBox="0 0 12 12"><path d="M3.2 1.6v8.8l7.2-4.4z" fill="currentColor"/></svg>
+    </span>
+  </a>
+
+  <div class="nav__label">Galaxy · Couture for the Cosmos</div>
+
+  <a class="pill pill--enter" href="#partners">
+    <span>Enter the Constellations</span>
+    <span class="pill__dot" aria-hidden="true">
+      <svg viewBox="0 0 12 12"><rect x="2.6" y="2" width="2.4" height="8" rx=".6" fill="currentColor"/><rect x="7" y="2" width="2.4" height="8" rx=".6" fill="currentColor"/></svg>
+    </span>
+  </a>
+
+  <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- ============ MENU OVERLAY ============ -->
+<nav class="menu" id="menu" aria-label="Main menu" inert>
+  <a href="#top" style="--i:0"><span class="menu__num">01</span><span>The Collection</span></a>
+  <a href="#walk" style="--i:1"><span class="menu__num">02</span><span>The Runway</span></a>
+  <a href="#partners" style="--i:2"><span class="menu__num">03</span><span>Constellations</span></a>
+</nav>
+
+<!-- ============ BOTTOM BAR ============ -->
+<nav class="bar" aria-label="Quick navigation">
+  <a class="pill pill--roadmap" href="#walk">
+    <svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+      <circle cx="6" cy="6" r="3.2"/>
+      <circle cx="20" cy="20" r="3.2"/>
+      <path d="M9 7.5c6 .5 1 11 8 11.2"/>
+    </svg>
+    <span>Galaxy Roadmap</span>
+  </a>
+
+  <button class="icon-btn" type="button" id="randomLook" aria-label="Random Galaxy look">
+    <svg viewBox="0 0 26 26" fill="none" aria-hidden="true">
+      <path d="M4 3.5l5.4 5h7.2l5.4-5v9.2c0 5.4-4 9.3-9 9.3s-9-3.900-9-9.300z" stroke="#f4efe6" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M6.600 12.800c1.700 2.600 11.100 2.600 12.800 0-1.700-1.800-11.100-1.800-12.800 0z" fill="#ffc857"/>
+    </svg>
+  </button>
+
+  <div class="switch">
+    <span>Press</span>
+    <button class="key" type="button" id="orbitKey" aria-label="Orbit: jump to the next stop">Orbit</button>
+    <span>to switch</span>
+  </div>
+
+  <a class="link-index" href="#partners">Galaxy Index ↗</a>
+
+  <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+</nav>
+
+<main id="top" class="scaffold">
+  <h1>Galaxy</h1>
+  <p>Couture for the Cosmos · <span class="gold">solar gold</span></p>
+  <p class="logo-test">Galaxy®</p>
+</main>
+<section id="walk" class="stub" aria-label="Story placeholder">Story placeholder (300svh)</section>
+<section id="partners" class="stub" aria-label="Constellations placeholder">Constellations placeholder</section>
+
+<script>
+/* ===================== UTIL ===================== */
+(function () {
+  "use strict";
+
+  // Scaling system: --vw = clientWidth / 1440
+  function setScale() {
+    var vw = document.documentElement.clientWidth / 1440;
+    document.documentElement.style.setProperty("--vw", String(vw));
+  }
+  setScale();
+  window.addEventListener("resize", setScale);
+  window.addEventListener("load", setScale);
+
+  function $(sel) { return document.querySelector(sel); }
+  function reduceMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+  function absTop(el) { return el.getBoundingClientRect().top + window.scrollY; }
+  function maxScroll() {
+    return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  }
+
+  /* ===================== SCROLL ===================== */
+  // Step 5 will create a Lenis instance and assign it here.
+  var lenis = null;
+
+  function scrollToY(y) {
+    y = Math.max(0, Math.min(maxScroll(), Math.round(y)));
+    if (lenis && !reduceMotion()) {
+      lenis.scrollTo(y, { duration: 1.6 });
+    } else {
+      window.scrollTo({ top: y, behavior: reduceMotion() ? "auto" : "smooth" });
+    }
+  }
+
+  function hashToY(hash) {
+    if (hash === "#top") return 0;
+    var el = hash && $(hash);
+    return el ? absTop(el) : null;
+  }
+
+  // The four ORBIT / Space stops: top, story start + 2% vh, story start + 135% vh, partners.
+  function stops() {
+    var vh = window.innerHeight;
+    var s = absTop($("#walk"));
+    var list = [0, s + 0.02 * vh, s + 1.35 * vh, absTop($("#partners"))];
+    var max = maxScroll();
+    return list.map(function (y) { return Math.min(y, max); });
+  }
+  function nextStop() {
+    var y = window.scrollY, list = stops();
+    for (var i = 0; i < list.length; i++) {
+      if (list[i] > y + 8) return list[i];
+    }
+    return 0; // past the last stop: wrap to top
+  }
+
+  /* ===================== NAV ===================== */
+  var menu = $("#menu");
+  var menuBtn = $(".menu-btn");
+
+  function setMenu(open) {
+    document.documentElement.classList.toggle("menu-open", open);
+    menu.classList.toggle("open", open);
+    if (open) { menu.removeAttribute("inert"); } else { menu.setAttribute("inert", ""); }
+    menuBtn.setAttribute("aria-expanded", String(open));
+    menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  }
+  function menuIsOpen() { return menu.classList.contains("open"); }
+
+  menuBtn.addEventListener("click", function () { setMenu(!menuIsOpen()); });
+
+  // Every in-page anchor (nav, menu, bar) goes through the same scroll function.
+  Array.prototype.forEach.call(document.querySelectorAll('a[href^="#"]'), function (a) {
+    a.addEventListener("click", function (e) {
+      var y = hashToY(a.getAttribute("href"));
+      if (y === null) return;
+      e.preventDefault();
+      if (menuIsOpen()) setMenu(false);
+      scrollToY(y);
+    });
+  });
+
+  /* ===================== BAR ===================== */
+  var key = $("#orbitKey");
+  function orbit() { scrollToY(nextStop()); }
+
+  key.addEventListener("click", orbit);
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && menuIsOpen()) {
+      setMenu(false);
+      menuBtn.focus();
+      return;
+    }
+    if (e.code !== "Space" || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+    if (menuIsOpen()) return;
+    var t = e.target;
+    if (t && t.closest && t.closest("input, textarea, select, button, a, [contenteditable]")) return;
+    e.preventDefault();
+    key.classList.add("is-pressed");
+    setTimeout(function () { key.classList.remove("is-pressed"); }, 160);
+    orbit();
+  });
+
+  // "Random Galaxy look": jump to a random point inside the story section.
+  $("#randomLook").addEventListener("click", function () {
+    var walk = $("#walk");
+    var span = Math.max(0, walk.offsetHeight - window.innerHeight);
+    scrollToY(absTop(walk) + Math.random() * span * 0.85);
+  });
+
+  /* ===================== SCROLL STATE ===================== */
+  var ticking = false;
+  function updateScrollState() {
+    ticking = false;
+    var vh = window.innerHeight;
+    document.body.classList.toggle("scrolled", window.scrollY > 0.35 * vh);
+    document.body.classList.toggle("bar-off", $("#partners").getBoundingClientRect().top < 0.55 * vh);
+  }
+  function requestUpdate() {
+    if (!ticking) { ticking = true; requestAnimationFrame(updateScrollState); }
+  }
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", requestUpdate);
+  window.addEventListener("load", requestUpdate);
+  updateScrollState();
+})();
+</script>
+</body>
+</html>

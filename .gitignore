@@ -1,0 +1,4 @@
+# Claude Code files - keep local, never commit
+.claude/
+CLAUDE.md
+CLAUDE.local.md
