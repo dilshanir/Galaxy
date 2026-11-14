@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="pre">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,6 +8,7 @@
 <meta name="theme-color" content="#07061a">
 
 <link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<noscript><style>html.pre .ch, html.pre .mark, html.pre .line > span, html.pre .tag, html.pre .nav > *, html.pre .bar > * { opacity: 1 !important; }</style></noscript>
 
 <style>
 /* ============ FONTS ============ */
@@ -121,37 +122,6 @@ button { font: inherit; color: inherit; }
 /* The tile sizes match the translation distance, so the loop is seamless. */
 @keyframes drift     { to { background-position: 240px 240px; } }
 @keyframes drift-far { to { background-position: -360px 360px; } }
-
-/* ============ STEP 1 SCAFFOLD (temporary; replaced in step 3) ============ */
-.scaffold {
-  position: relative;
-  z-index: 1;
-  min-height: 100svh;
-  display: grid;
-  place-content: center;
-  text-align: center;
-  padding: 0 16px;
-}
-.scaffold h1 {
-  margin: 0;
-  font-weight: 650;
-  font-size: calc(177 * var(--u));
-  line-height: 1;
-}
-.scaffold p {
-  margin: 12px 0 0;
-  font-size: calc(14.5 * var(--n));
-  letter-spacing: .3em;
-  text-transform: uppercase;
-  color: var(--mute);
-}
-.scaffold .gold { color: var(--accent); }
-.scaffold .logo-test {
-  margin-top: 24px;
-  font-family: "Outfit", sans-serif;
-  font-weight: 600;
-  font-size: calc(30 * var(--n));
-}
 
 /* ============ STEP 2: SHARED PILL / FOCUS ============ */
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
@@ -423,6 +393,293 @@ body.bar-off .bar > * { pointer-events: none; }
   .switch > span { display: none; }
 }
 
+/* ============ STEP 3: HERO ============ */
+/* Opening animation: everything it animates stays hidden until fonts are ready. */
+html.pre .ch, html.pre .mark, html.pre .line > span, html.pre .tag,
+html.pre .nav > :not(.logo), html.pre .bar > * { opacity: 0; }
+
+.hero {
+  position: relative;
+  z-index: 1;
+  height: 100svh;
+  min-height: 520px;
+}
+.wordmark {
+  position: absolute;
+  left: calc(53 * var(--u));
+  top: calc(72.3 * var(--u));
+  margin: 0;
+  font-size: calc(177 * var(--u));
+  font-weight: 650;
+  font-stretch: 112.5%;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translateY(var(--py, 0px));
+  will-change: transform;
+}
+.ch { display: inline-block; }
+/* Very subtle aurora tint on hover only */
+.wordmark:hover .ch {
+  background-image: linear-gradient(120deg, #f4efe6 0%, #d6caff 30%, #ffd0f0 55%, #c4f6ec 80%, #f4efe6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.mark {
+  position: absolute;
+  left: var(--mark-left, 104%);
+  top: .1em;
+  width: .15em;
+  height: .15em;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tagline {
+  position: absolute;
+  left: calc(53 * var(--u));
+  top: calc(262 * var(--u));
+  width: calc(1107 * var(--u));
+  margin: 0;
+  padding-bottom: calc(9 * var(--u));
+  border-bottom: 1px solid var(--line);
+  font-size: calc(11 * var(--u));
+  font-weight: 600;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--mute);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.copy {
+  position: absolute;
+  top: calc(298 * var(--u));
+  font-size: calc(16.5 * var(--u));
+  font-stretch: var(--copy-stretch, 112%);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+.copy--1 { left: calc(53 * var(--u)); }
+.copy--2 { left: calc(339 * var(--u)); }
+.copy .line { display: block; overflow: hidden; white-space: nowrap; }
+.copy .line > span { display: inline-block; }
+.copy .line--strong { font-weight: 850; }
+
+.tag {
+  position: absolute;
+  left: calc(1022 * var(--u));
+  top: calc(596 * var(--u));
+  display: flex;
+  align-items: center;
+  gap: calc(12 * var(--u));
+  font-size: calc(13 * var(--u));
+  font-weight: 700;
+  letter-spacing: .14em;
+}
+.tag svg {
+  width: calc(64 * var(--u));
+  height: calc(40 * var(--u));
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tag path { stroke-dasharray: 1; stroke-dashoffset: 0; animation: draw 3.6s ease-in-out infinite; }
+@keyframes draw {
+  0%   { stroke-dashoffset: 1; opacity: 1; }
+  45%  { stroke-dashoffset: 0; opacity: 1; }
+  85%  { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* Hero still: only for phones and reduced motion. Never requested on desktop. */
+.hero-still {
+  display: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 0;
+  -webkit-mask-image: linear-gradient(#000 70%, transparent);
+  mask-image: linear-gradient(#000 70%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-still { display: block; position: absolute; inset: 0; z-index: -1; }
+}
+@media (max-width: 820px) {
+  .hero {
+    height: auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: calc(86 * var(--u)) calc(16 * var(--u)) 0;
+  }
+  .wordmark {
+    position: relative;
+    left: auto; top: auto;
+    align-self: flex-start;
+    font-size: calc(76 * var(--u));
+    letter-spacing: -.01em;
+    transform: none;
+  }
+  .tagline { position: static; width: auto; margin-top: calc(4 * var(--u)); font-size: calc(10 * var(--u)); }
+  .copy { position: static; margin-top: calc(22 * var(--u)); }
+  .tag { position: static; margin-top: calc(22 * var(--u)); }
+  .hero-still {
+    display: block;
+    position: static;
+    z-index: auto;
+    order: 99;
+    width: calc(100% + 32 * var(--u));
+    height: calc(470 * var(--u));
+    margin: calc(10 * var(--u)) calc(-16 * var(--u)) 0;
+    -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 72%, transparent);
+    mask-image: linear-gradient(transparent, #000 18%, #000 72%, transparent);
+  }
+}
+
+/* ============ STEP 5: SCENE (scroll-scrubbed video canvas) ============ */
+.stage { position: relative; }
+.scene {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  margin-bottom: -100svh;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity .9s ease;
+  pointer-events: none;
+}
+body.scene-on .scene { opacity: 1; }
+.scene canvas { display: block; width: 100%; height: 100%; }
+@media (max-width: 820px) { .scene { display: none; } }
+@media (prefers-reduced-motion: reduce) { .scene { display: none; } }
+
+/* Standard Lenis CSS */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-scrolling iframe { pointer-events: none; }
+
+/* ============ STEP 4: STAGE + STORY ============ */
+
+.story { position: relative; z-index: 1; height: 300svh; }
+.story__frame {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+.story-still {
+  display: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-still { display: block; position: absolute; inset: 0; z-index: -1; }
+}
+
+.panel {
+  position: absolute;
+  top: calc(262 * var(--u));
+  left: calc(140 * var(--u));
+  width: calc(600 * var(--u));
+  opacity: var(--o, 0);
+  pointer-events: none;
+}
+.panel--1 { transform: translateX(var(--x, 0px)); }
+.panel__label {
+  margin: 0 0 calc(18 * var(--u));
+  font-size: calc(11 * var(--u));
+  font-weight: 600;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--mute);
+  transform: translateX(calc((1 - var(--e, 0)) * -16px));
+}
+.panel__title {
+  margin: 0;
+  font-size: calc(40 * var(--u));
+  font-weight: 900;
+  font-stretch: 125%;
+  line-height: .92;
+  text-transform: uppercase;
+}
+.panel__title .hl { display: block; overflow: hidden; padding-bottom: .04em; }
+.panel__title .hl > span {
+  display: block;
+  transform: translateY(calc((1 - var(--e, 0)) * (105% + var(--k, 0) * 20%)));
+}
+.panel__text {
+  max-width: calc(330 * var(--u));
+  margin: calc(24 * var(--u)) 0 0;
+  font-size: calc(15.5 * var(--u));
+  line-height: 1.55;
+  color: rgba(244,239,230,.86);
+  transform: translateY(calc((1 - var(--e, 0)) * 24px));
+}
+.gold { color: var(--accent); }
+
+.dashes {
+  position: absolute;
+  left: calc(140 * var(--u));
+  top: calc(520 * var(--u));
+  display: flex;
+  gap: calc(10 * var(--u));
+  opacity: var(--do, 0);
+  transform: translateX(var(--dx, 0px));
+  pointer-events: none;
+}
+.dash {
+  position: relative;
+  width: calc(64 * var(--u));
+  height: 2px;
+  background: var(--line);
+  overflow: hidden;
+}
+.dash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: scaleX(var(--f, 0));
+  transform-origin: left;
+}
+
+@media (max-width: 820px) {
+  .story { height: auto; padding: calc(56 * var(--u)) calc(16 * var(--u)) 0; }
+  .story__frame { position: static; height: auto; overflow: visible; }
+  .panel {
+    position: static;
+    width: auto;
+    margin-bottom: calc(44 * var(--u));
+    opacity: 1;
+    transform: none;
+  }
+  .panel__label, .panel__text, .panel__title .hl > span { transform: none; }
+  .dashes { display: none; }
+  .story-still {
+    display: block;
+    position: static;
+    z-index: auto;
+    width: calc(100% + 32 * var(--u));
+    height: calc(520 * var(--u));
+    margin: 0 calc(-16 * var(--u));
+    -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 72%, transparent);
+    mask-image: linear-gradient(transparent, #000 18%, #000 72%, transparent);
+  }
+}
+
 /* ============ STEP 2 TEMP STUBS (replaced by real sections later) ============ */
 .stub {
   position: relative;
@@ -436,7 +693,6 @@ body.bar-off .bar > * { pointer-events: none; }
   letter-spacing: .3em;
   text-transform: uppercase;
 }
-#walk.stub { height: 300svh; align-content: start; padding-top: 40svh; }
 #partners.stub { height: 100svh; }
 
 /* ============ REDUCED MOTION ============ */
@@ -516,13 +772,71 @@ body.bar-off .bar > * { pointer-events: none; }
   <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
 </nav>
 
-<main id="top" class="scaffold">
-  <h1>Galaxy</h1>
-  <p>Couture for the Cosmos · <span class="gold">solar gold</span></p>
-  <p class="logo-test">Galaxy®</p>
-</main>
-<section id="walk" class="stub" aria-label="Story placeholder">Story placeholder (300svh)</section>
+<main>
+<div class="stage" id="stage">
+<!-- ============ SCENE (video frames are painted here) ============ -->
+<div class="scene" aria-hidden="true"><canvas id="sceneCanvas"></canvas></div>
+<!-- ============ HERO ============ -->
+<section class="hero" id="top" aria-label="Galaxy">
+  <img class="hero-still" alt="" decoding="async" width="2048" height="1360">
+
+  <h1 class="wordmark" aria-label="Galaxy">
+    <span class="ch" aria-hidden="true">G</span><span class="ch" aria-hidden="true">a</span><span class="ch" aria-hidden="true">l</span><span class="ch" aria-hidden="true">a</span><span class="ch" aria-hidden="true">x</span><span class="ch" aria-hidden="true">y</span>
+    <svg class="mark" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="10.5"/>
+      <path d="M9 17.200V6.800h3.900a3.100 3.100 0 0 1 0 6.200H9M12.800 13l2.800 4.200"/>
+    </svg>
+  </h1>
+  <p class="tagline">— Couture for the Cosmos —</p>
+
+  <div class="copy copy--1">
+    <span class="line line--strong"><span>Galaxy is woven from starlight,</span></span>
+    <span class="line"><span>tailored for the dark,</span></span>
+    <span class="line"><span>ready to wear</span></span>
+  </div>
+  <div class="copy copy--2">
+    <span class="line"><span>Meet all</span></span>
+    <span class="line"><span>8888 Galaxy-stitched</span></span>
+    <span class="line"><span>Big-eared celestials</span></span>
+  </div>
+
+  <div class="tag">
+    <span>GLX0042.</span>
+    <svg viewBox="0 0 64 40" aria-hidden="true">
+      <path pathLength="1" d="M4 35C24 35 42 28 58 7M47 6.500H58.500V18"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ============ STORY ============ -->
+<section class="story" id="walk" aria-label="The story">
+  <div class="story__frame">
+    <img class="story-still" alt="" decoding="async" width="2048" height="1360">
+
+    <article class="panel panel--1" id="panel1">
+      <p class="panel__label">01 /</p>
+      <h2 class="panel__title">
+        <span class="hl" style="--k:0"><span>Wear the</span></span>
+        <span class="hl" style="--k:1"><span>Night sky</span></span>
+      </h2>
+      <p class="panel__text">Slip into limited Galaxy drops stitched with real constellations. Climb the Galaxy Index, collect <span class="gold">rare star-charts</span> and design a silhouette that glows in every world.</p>
+    </article>
+
+    <article class="panel panel--2" id="panel2">
+      <p class="panel__label">02 /</p>
+      <h2 class="panel__title">
+        <span class="hl" style="--k:0"><span>Own the</span></span>
+        <span class="hl" style="--k:1"><span>Runway</span></span>
+      </h2>
+      <p class="panel__text">Step onto Galaxy's orbit-lit catwalk and unfold the whole wardrobe. Become a <span class="gold">CELESTIAL ICON</span> and unlock real-world perks.</p>
+    </article>
+
+    <div class="dashes" aria-hidden="true"><span class="dash" id="dash1"></span><span class="dash" id="dash2"></span></div>
+  </div>
+</section>
+</div><!-- /stage -->
 <section id="partners" class="stub" aria-label="Constellations placeholder">Constellations placeholder</section>
+</main>
 
 <script>
 /* ===================== UTIL ===================== */
@@ -589,6 +903,7 @@ body.bar-off .bar > * { pointer-events: none; }
   function setMenu(open) {
     document.documentElement.classList.toggle("menu-open", open);
     menu.classList.toggle("open", open);
+    if (lenis) { if (open) { lenis.stop(); } else { lenis.start(); } }
     if (open) { menu.removeAttribute("inert"); } else { menu.setAttribute("inert", ""); }
     menuBtn.setAttribute("aria-expanded", String(open));
     menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
@@ -603,6 +918,7 @@ body.bar-off .bar > * { pointer-events: none; }
       var y = hashToY(a.getAttribute("href"));
       if (y === null) return;
       e.preventDefault();
+      e.stopPropagation(); // keep Lenis' own anchor handler from scrolling a second time
       if (menuIsOpen()) setMenu(false);
       scrollToY(y);
     });
@@ -644,6 +960,11 @@ body.bar-off .bar > * { pointer-events: none; }
     var vh = window.innerHeight;
     document.body.classList.toggle("scrolled", window.scrollY > 0.35 * vh);
     document.body.classList.toggle("bar-off", $("#partners").getBoundingClientRect().top < 0.55 * vh);
+    // Wordmark parallax: rises by 40% of the viewport height over the first screen.
+    if (!reduceMotion()) {
+      hero.style.setProperty("--py", (-0.4 * Math.min(vh, window.scrollY)).toFixed(1) + "px");
+    }
+    updateStory();
   }
   function requestUpdate() {
     if (!ticking) { ticking = true; requestAnimationFrame(updateScrollState); }
@@ -651,6 +972,642 @@ body.bar-off .bar > * { pointer-events: none; }
   window.addEventListener("scroll", requestUpdate, { passive: true });
   window.addEventListener("resize", requestUpdate);
   window.addEventListener("load", requestUpdate);
+
+  /* ===================== HERO ===================== */
+  // Asset placeholders. Replace each {{...}} with a real URL. A value that still
+  // contains "{{" is never requested.
+  var ASSETS = {
+    video: "{{VIDEO_URL}}",
+    heroStill: "{{HERO_STILL}}",
+    storyStill: "{{STORY_STILL}}",
+    partnerSheet: "{{PARTNER_SHEET}}"
+  };
+
+  var hero = $(".hero");
+  var wordmark = $(".wordmark");
+  var markEl = $(".mark");
+  var heroStill = $(".hero-still");
+
+  function isPhone() { return window.matchMedia("(max-width: 820px)").matches; }
+  // Design unit in real pixels: clientWidth / 1440 on desktop, / 390 on phones.
+  function unitPx() { return document.documentElement.clientWidth / (isPhone() ? 390 : 1440); }
+
+  // Still width: viewport width x DPR x 1.05, rounded to a multiple of 64, 1024..2048.
+  function stillWidth() {
+    var w = document.documentElement.clientWidth * (window.devicePixelRatio || 1) * 1.05;
+    w = Math.round(w / 64) * 64;
+    return Math.max(1024, Math.min(2048, w));
+  }
+  function setStill(img, base) {
+    if (!img || img.getAttribute("src")) return;
+    if (!base || base.indexOf("{{") !== -1) return;
+    img.src = base + (base.indexOf("?") === -1 ? "?" : "&") + "w=" + stillWidth();
+  }
+  function maybeLoadStills() {
+    if (isPhone() || reduceMotion()) {
+      setStill(heroStill, ASSETS.heroStill);
+      setStill($(".story-still"), ASSETS.storyStill);
+    }
+  }
+
+  /* ===================== STORY ===================== */
+  var story = $("#walk");
+  var panel1 = $("#panel1");
+  var panel2 = $("#panel2");
+  var storyDashes = $(".dashes");
+  var dash1 = $("#dash1");
+  var dash2 = $("#dash2");
+
+  function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+  function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+  function setPanel(el, o, e, x) {
+    el.style.setProperty("--o", o.toFixed(3));
+    el.style.setProperty("--e", e.toFixed(3));
+    if (x !== undefined) el.style.setProperty("--x", x.toFixed(1) + "px");
+  }
+
+  function updateStory() {
+    if (isPhone()) return; // phones stack the panels; CSS handles it
+    var rect = story.getBoundingClientRect();
+    var p = clamp01(-rect.top / Math.max(1, rect.height - window.innerHeight));
+    var u = unitPx();
+    var slide = 720 * u; // panel 01 travels from left 140u to left 860u
+
+    if (reduceMotion()) {
+      // No scrubbing: the panels switch at the midpoint.
+      var first = p < 0.5 ? 1 : 0;
+      setPanel(panel1, first, 1, slide);
+      setPanel(panel2, 1 - first, 1);
+      storyDashes.style.setProperty("--do", "0");
+      return;
+    }
+
+    var o1 = clamp01((p - 0.20) / 0.06) * (1 - clamp01((p - 0.43) / 0.06));
+    var o2 = clamp01((p - 0.64) / 0.08);
+    var x = slide * ease(clamp01((p - 0.20) / 0.25));
+    setPanel(panel1, o1, ease(o1), x);
+    setPanel(panel2, o2, ease(o2));
+
+    // Progress dashes: fill over p .20-.55 and .55-1; they ride with panel 01, then return.
+    var dx = x * (1 - clamp01((p - 0.55) / 0.09));
+    storyDashes.style.setProperty("--dx", dx.toFixed(1) + "px");
+    storyDashes.style.setProperty("--do", clamp01((p - 0.18) / 0.04).toFixed(3));
+    dash1.style.setProperty("--f", clamp01((p - 0.20) / 0.35).toFixed(3));
+    dash2.style.setProperty("--f", clamp01((p - 0.55) / 0.45).toFixed(3));
+  }
+
+  // Letter-spacing is fitted so the ink of "Galaxy" spans 53u -> 1160u.
+  function fitWordmark() {
+    wordmark.style.letterSpacing = "";
+    wordmark.style.left = "";
+    markEl.style.left = "";
+    if (isPhone()) return;
+    var u = unitPx();
+    var ctx = document.createElement("canvas").getContext("2d");
+    ctx.font = "650 " + (177 * u) + "px Archivo";
+    if ("fontStretch" in ctx) ctx.fontStretch = "semi-expanded"; // 112.5%
+    var text = "Galaxy", adv = 0, lb = 0, rb = 0;
+    for (var i = 0; i < text.length; i++) {
+      var m = ctx.measureText(text[i]);
+      adv += m.width;
+      if (i === 0) lb = -m.actualBoundingBoxLeft;
+      if (i === text.length - 1) rb = m.width - m.actualBoundingBoxRight;
+    }
+    var ls = (1107 * u - (adv - lb - rb)) / (text.length - 1);
+    wordmark.style.letterSpacing = ls.toFixed(2) + "px";
+    wordmark.style.left = (53 * u - lb).toFixed(2) + "px";
+    markEl.style.left = (adv + (text.length - 1) * ls - rb + 10 * u).toFixed(2) + "px";
+  }
+
+  // Block 1 may not run into block 2 (left 339u): narrow the copy's font-stretch until it fits.
+  function fitCopy() {
+    hero.style.removeProperty("--copy-stretch");
+    var sel = isPhone() ? ".copy .line > span" : ".copy--1 .line > span";
+    var spans = hero.querySelectorAll(sel);
+    var avail = (isPhone() ? 358 : 272) * unitPx();
+    var stretch = 112;
+    while (stretch > 62) {
+      var widest = 0;
+      for (var i = 0; i < spans.length; i++) widest = Math.max(widest, spans[i].offsetWidth);
+      if (widest <= avail) break;
+      stretch -= 3;
+      hero.style.setProperty("--copy-stretch", stretch + "%");
+    }
+  }
+
+  var layoutQueued = false;
+  function layout() {
+    layoutQueued = false;
+    fitWordmark();
+    fitCopy();
+    maybeLoadStills();
+  }
+  function queueLayout() {
+    if (!layoutQueued) { layoutQueued = true; requestAnimationFrame(layout); }
+  }
+  window.addEventListener("resize", queueLayout);
+
+  /* ===================== SCENE ===================== */
+  var CDN = {
+    mp4box: "https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js",
+    lenis: "https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"
+  };
+  var FPS = 24;
+  var LAST = 240;               // last frame index (241 frames); corrected when decoding finishes
+  var stageEl = $("#stage");
+  var canvas = $("#sceneCanvas");
+  var g = canvas.getContext("2d");
+
+  var frames = [];              // index -> { blob, l:[r,g,b], r:[r,g,b] }
+  var bitmaps = new Map();      // index -> ImageBitmap (LRU window of 56)
+  var loadingBitmaps = new Set();
+  var decodedCount = 0;
+  var sceneShown = false;
+  var needDraw = true;
+  var canvasDirty = true;
+  var vidW = 1280, vidH = 720;
+  var cur = 0, lastNow = 0, lastKey = "", wantF = 0, wantT = 0;
+  var fallbackStarted = false;
+
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = src;
+      s.async = true;
+      s.onload = resolve;
+      s.onerror = function () { reject(new Error("Could not load " + src)); };
+      document.head.appendChild(s);
+    });
+  }
+
+  function avgPx(a) {
+    var r = 0, gr = 0, b = 0, n = a.length / 4;
+    for (var i = 0; i < a.length; i += 4) { r += a[i]; gr += a[i + 1]; b += a[i + 2]; }
+    return [Math.round(r / n), Math.round(gr / n), Math.round(b / n)];
+  }
+
+  // ---- Frame store and bitmap window ----
+  function storeFrame(index, blob, l, r) {
+    if (frames[index]) return;
+    frames[index] = { blob: blob, l: l, r: r };
+    decodedCount++;
+    if (index === 0 && !sceneShown) showScene();
+    wantBitmaps();
+  }
+
+  function showScene() {
+    createImageBitmap(frames[0].blob).then(function (bm) {
+      vidW = bm.width; vidH = bm.height;
+      bitmaps.set(0, bm);
+      cur = currentTarget();
+      sceneShown = true;
+      resizeCanvas();
+      lastKey = "";
+      renderScene(performance.now());
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { document.body.classList.add("scene-on"); });
+      });
+    });
+  }
+
+  function decodeBitmap(i) {
+    loadingBitmaps.add(i);
+    createImageBitmap(frames[i].blob).then(function (bm) {
+      loadingBitmaps.delete(i);
+      bitmaps.set(i, bm);
+      evictBitmaps();
+      needDraw = true;
+      wantBitmaps();
+    }, function () { loadingBitmaps.delete(i); });
+  }
+
+  // Keep a window from 4 frames behind to 14 frames past the target; nearest first, 8 in flight.
+  function wantBitmaps() {
+    var lo = Math.max(0, wantF - 4);
+    var hi = Math.min(LAST, Math.ceil(wantT) + 14);
+    for (var d = 0; d <= hi - lo + 4 && loadingBitmaps.size < 8; d++) {
+      var c = [wantF + d, wantF - d];
+      for (var k = 0; k < 2; k++) {
+        var i = c[k];
+        if (i < lo || i > hi || k === 1 && d === 0) continue;
+        if (frames[i] && !bitmaps.has(i) && !loadingBitmaps.has(i) && loadingBitmaps.size < 8) decodeBitmap(i);
+      }
+    }
+  }
+
+  function evictBitmaps() {
+    while (bitmaps.size > 56) {
+      var far = -1, farD = -1;
+      bitmaps.forEach(function (v, key) {
+        var d = Math.abs(key - wantF);
+        if (d > farD) { farD = d; far = key; }
+      });
+      if (far < 0) break;
+      bitmaps.get(far).close();
+      bitmaps.delete(far);
+    }
+  }
+
+  function nearestBitmap(i) {
+    for (var d = 0; d <= 12; d++) {
+      if (bitmaps.has(i - d)) return bitmaps.get(i - d);
+      if (bitmaps.has(i + d)) return bitmaps.get(i + d);
+    }
+    return null;
+  }
+  function nearestEdges(i) {
+    for (var d = 0; d <= 12; d++) {
+      if (frames[i - d]) return frames[i - d];
+      if (frames[i + d]) return frames[i + d];
+    }
+    return null;
+  }
+
+  // ---- Rendering ----
+  function resizeCanvas() {
+    var r = canvas.getBoundingClientRect();
+    var s = Math.min(window.devicePixelRatio || 1, 1.5);
+    var w = Math.max(1, Math.round(r.width * s));
+    var h = Math.max(1, Math.round(r.height * s));
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+    canvasDirty = false;
+    lastKey = "";
+  }
+  window.addEventListener("resize", function () { canvasDirty = true; });
+
+  function currentTarget() {
+    var rect = stageEl.getBoundingClientRect();
+    var P = clamp01(-rect.top / Math.max(1, rect.height - window.innerHeight));
+    return Math.min(1, P / 0.85) * LAST;
+  }
+
+  function rgb(c) { return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"; }
+  function rgba(c, a) { return "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + a + ")"; }
+  function mixC(a, b, t) {
+    return [Math.round(a[0] + (b[0] - a[0]) * t), Math.round(a[1] + (b[1] - a[1]) * t), Math.round(a[2] + (b[2] - a[2]) * t)];
+  }
+
+  function draw(i, frac, t) {
+    var W = canvas.width, H = canvas.height;
+    // Rect 0: hero layout. Cover-fit inside a box of height max(W*900/1440, H), anchored at the top.
+    var boxH = Math.max(W * 900 / 1440, H);
+    var s0 = Math.max(W / vidW, boxH / vidH);
+    var w0 = vidW * s0, h0 = vidH * s0, x0 = (W - w0) / 2;
+    // Rect 1: fit to full height, centred.
+    var s1 = H / vidH, w1 = vidW * s1, h1 = H, x1 = (W - w1) / 2;
+    var x = x0 + (x1 - x0) * t, w = w0 + (w1 - w0) * t, h = h0 + (h1 - h0) * t;
+
+    g.globalAlpha = 1;
+    g.fillStyle = "#07061a";
+    g.fillRect(0, 0, W, H);
+
+    var a = nearestBitmap(i);
+    var b = frac > 0 ? nearestBitmap(i + 1) : null;
+
+    // Wide screens: fill the sides with the frame's edge colours and feather the seam over 6%.
+    var ea = nearestEdges(i), eb = frac > 0 ? nearestEdges(i + 1) : null;
+    if (ea && (x > 0.5 || x + w < W - 0.5)) {
+      var L = eb ? mixC(ea.l, eb.l, frac) : ea.l;
+      var R = eb ? mixC(ea.r, eb.r, frac) : ea.r;
+      if (x > 0.5) { g.fillStyle = rgb(L); g.fillRect(0, 0, x, H); }
+      if (x + w < W - 0.5) { g.fillStyle = rgb(R); g.fillRect(x + w, 0, W - x - w, H); }
+    }
+    if (a) g.drawImage(a, x, 0, w, h);
+    if (b && b !== a) {
+      g.globalAlpha = frac;
+      g.drawImage(b, x, 0, w, h);
+      g.globalAlpha = 1;
+    }
+    if (ea && (x > 0.5 || x + w < W - 0.5)) {
+      var fw = w * 0.06, gr;
+      var L2 = eb ? mixC(ea.l, eb.l, frac) : ea.l;
+      var R2 = eb ? mixC(ea.r, eb.r, frac) : ea.r;
+      if (x > 0.5) {
+        gr = g.createLinearGradient(x, 0, x + fw, 0);
+        gr.addColorStop(0, rgba(L2, 1)); gr.addColorStop(1, rgba(L2, 0));
+        g.fillStyle = gr; g.fillRect(x, 0, fw, H);
+      }
+      if (x + w < W - 0.5) {
+        gr = g.createLinearGradient(x + w, 0, x + w - fw, 0);
+        gr.addColorStop(0, rgba(R2, 1)); gr.addColorStop(1, rgba(R2, 0));
+        g.fillStyle = gr; g.fillRect(x + w - fw, 0, fw, H);
+      }
+    }
+  }
+
+  function renderScene(now) {
+    if (canvasDirty) resizeCanvas();
+    var target = currentTarget();
+    var k = lenis ? 0.6 : 0.25;
+    var dt = lastNow ? Math.min(100, now - lastNow) : 16.7;
+    cur += (target - cur) * (1 - Math.pow(1 - k, dt / 16.7));
+    if (Math.abs(target - cur) < 0.02) cur = target;
+
+    var f = Math.floor(cur);
+    if (f !== wantF || Math.abs(target - wantT) > 0.5) {
+      wantF = f; wantT = target;
+      wantBitmaps();
+    }
+    var i = Math.min(LAST, f);
+    var frac = i >= LAST ? 0 : cur - i;
+    var t = ease(clamp01((cur / LAST - 0.35) / 0.55));
+    // Redraw only when the frame, the blend (2 decimals) or the framing (3 decimals) changes.
+    var key = i + "|" + frac.toFixed(2) + "|" + t.toFixed(3) + "|" + canvas.width + "x" + canvas.height;
+    if (key !== lastKey || needDraw) {
+      draw(i, Number(frac.toFixed(2)), t);
+      lastKey = key;
+      needDraw = false;
+    }
+  }
+
+  function tick(now) {
+    if (lenis) lenis.raf(now);
+    if (sceneShown) renderScene(now);
+    lastNow = now;
+    requestAnimationFrame(tick);
+  }
+
+  // ---- Frame extraction: WebCodecs + mp4box + a pool of encoder workers ----
+  function workerMain() {
+    var cv = null, cx = null;
+    function avg(a) {
+      var r = 0, g = 0, b = 0, n = a.length / 4;
+      for (var i = 0; i < a.length; i += 4) { r += a[i]; g += a[i + 1]; b += a[i + 2]; }
+      return [Math.round(r / n), Math.round(g / n), Math.round(b / n)];
+    }
+    self.onmessage = async function (e) {
+      var d = e.data, f = d.frame;
+      try {
+        var w = f.displayWidth, h = f.displayHeight;
+        if (!cv || cv.width !== w || cv.height !== h) {
+          cv = new OffscreenCanvas(w, h);
+          cx = cv.getContext("2d", { willReadFrequently: true });
+        }
+        cx.drawImage(f, 0, 0);
+        f.close();
+        var l = avg(cx.getImageData(0, 0, 4, h).data);
+        var r = avg(cx.getImageData(w - 4, 0, 4, h).data);
+        var blob = await cv.convertToBlob({ type: "image/jpeg", quality: 0.88 });
+        self.postMessage({ index: d.index, time: d.time, blob: blob, l: l, r: r });
+      } catch (err) {
+        self.postMessage({ index: d.index, error: String(err) });
+      }
+    };
+  }
+
+  function getDescription(mp4, track) {
+    var trak = mp4.getTrackById(track.id);
+    var entries = trak.mdia.minf.stbl.stsd.entries;
+    for (var i = 0; i < entries.length; i++) {
+      var box = entries[i].avcC || entries[i].hvcC || entries[i].vpcC || entries[i].av1C;
+      if (box) {
+        var stream = new DataStream(undefined, 0, DataStream.BIG_ENDIAN);
+        box.write(stream);
+        return new Uint8Array(stream.buffer, 8); // drop the 8-byte box header
+      }
+    }
+    throw new Error("No codec description in the MP4");
+  }
+
+  function startWebCodecs(url) {
+    var N = Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 2) - 1));
+    var blobUrl = URL.createObjectURL(new Blob(["(" + workerMain.toString() + ")()"], { type: "text/javascript" }));
+    var workers = [], inflight = 0, outIndex = 0, received = 0;
+    var pending = [], gotAll = false, flushed = false, failed = false;
+    var mp4 = MP4Box.createFile();
+    var track = null, decoder = null;
+
+    function fail(err) {
+      if (failed) return;
+      failed = true;
+      console.warn("Scene: WebCodecs path failed.", err);
+      workers.forEach(function (w) { w.terminate(); });
+      if (!decodedCount) startFallback(url);
+    }
+
+    function pump() {
+      if (failed || !decoder || decoder.state !== "configured") return;
+      // Backpressure: fewer than 4 queued decodes, fewer than 3 frames per worker waiting.
+      while (pending.length && decoder.decodeQueueSize < 4 && inflight < 3 * N) {
+        decoder.decode(pending.shift());
+      }
+      if (gotAll && !pending.length && !flushed) {
+        flushed = true;
+        decoder.flush().then(function () { LAST = Math.max(1, outIndex - 1); }).catch(fail);
+      }
+    }
+
+    for (var i = 0; i < N; i++) {
+      var w = new Worker(blobUrl);
+      w.onmessage = function (e) {
+        inflight--;
+        var d = e.data;
+        if (d.error) { console.warn("Scene: frame encode failed.", d.error); } else { storeFrame(d.index, d.blob, d.l, d.r); }
+        pump();
+      };
+      w.onerror = fail;
+      workers.push(w);
+    }
+
+    decoder = new VideoDecoder({
+      output: function (frame) {
+        var idx = outIndex++;
+        inflight++;
+        workers[idx % N].postMessage({ index: idx, time: frame.timestamp, frame: frame }, [frame]);
+      },
+      error: fail
+    });
+    decoder.addEventListener("dequeue", pump);
+
+    mp4.onError = fail;
+    mp4.onReady = function (info) {
+      try {
+        track = info.videoTracks[0];
+        if (!track) throw new Error("No video track");
+        decoder.configure({
+          codec: track.codec,
+          codedWidth: track.video.width,
+          codedHeight: track.video.height,
+          description: getDescription(mp4, track),
+          hardwareAcceleration: "prefer-software"
+        });
+        mp4.setExtractionOptions(track.id, null, { nbSamples: 12 });
+        mp4.start();
+      } catch (err) { fail(err); }
+    };
+    mp4.onSamples = function (id, user, samples) {
+      for (var j = 0; j < samples.length; j++) {
+        var s = samples[j];
+        pending.push(new EncodedVideoChunk({
+          type: s.is_sync ? "key" : "delta",
+          timestamp: 1e6 * s.cts / s.timescale,
+          duration: 1e6 * s.duration / s.timescale,
+          data: s.data
+        }));
+      }
+      received += samples.length;
+      if (track && received >= track.nb_samples) gotAll = true;
+      pump();
+    };
+
+    fetch(url, { mode: "cors" }).then(function (res) {
+      if (!res.ok || !res.body) throw new Error("HTTP " + res.status);
+      var reader = res.body.getReader(), offset = 0;
+      function read() {
+        return reader.read().then(function (r) {
+          if (r.done) { mp4.flush(); return; }
+          var v = r.value;
+          var ab = v.buffer.slice(v.byteOffset, v.byteOffset + v.byteLength);
+          ab.fileStart = offset;
+          offset += ab.byteLength;
+          mp4.appendBuffer(ab);
+          return read();
+        });
+      }
+      return read();
+    }).catch(fail);
+  }
+
+  // Fallback: play the video slowly in a tiny element and grab frames as they are presented.
+  function startFallback(url) {
+    if (fallbackStarted) return;
+    fallbackStarted = true;
+    var v = document.createElement("video");
+    if (!("requestVideoFrameCallback" in v)) { console.warn("Scene: no frame-capture path available."); return; }
+    v.muted = true;
+    v.playsInline = true;
+    v.preload = "auto";
+    v.crossOrigin = "anonymous";
+    v.style.cssText = "position:fixed;left:0;top:0;width:2px;height:2px;opacity:.01;pointer-events:none";
+    v.src = url;
+    document.body.appendChild(v);
+    var cv = document.createElement("canvas");
+    var cx = cv.getContext("2d", { willReadFrequently: true });
+    v.addEventListener("loadedmetadata", function () {
+      cv.width = v.videoWidth; cv.height = v.videoHeight;
+      v.playbackRate = 0.5;
+      v.play().catch(function () {});
+    });
+    function grab(now, meta) {
+      var idx = Math.round(meta.mediaTime * FPS), w = cv.width, h = cv.height;
+      cx.drawImage(v, 0, 0);
+      var l = avgPx(cx.getImageData(0, 0, 4, h).data);
+      var r = avgPx(cx.getImageData(w - 4, 0, 4, h).data);
+      cv.toBlob(function (b) { if (b) storeFrame(idx, b, l, r); }, "image/jpeg", 0.88);
+      v.requestVideoFrameCallback(grab);
+    }
+    v.requestVideoFrameCallback(grab);
+    v.addEventListener("ended", function () { LAST = Math.max(1, Math.round(v.duration * FPS)); });
+  }
+
+  function startVideo() {
+    var url = ASSETS.video;
+    if (!url || url.indexOf("{{") !== -1) return; // placeholder: nothing is requested
+    var capable = typeof VideoDecoder !== "undefined" && typeof EncodedVideoChunk !== "undefined" &&
+      typeof Worker !== "undefined" && typeof OffscreenCanvas !== "undefined" && typeof ReadableStream !== "undefined";
+    if (!capable) { startFallback(url); return; }
+    loadScript(CDN.mp4box).then(function () {
+      if (typeof MP4Box === "undefined" || typeof DataStream === "undefined") throw new Error("mp4box globals missing");
+      startWebCodecs(url);
+    }).catch(function (err) {
+      console.warn("Scene: could not start WebCodecs.", err);
+      startFallback(url);
+    });
+  }
+
+  function startLenis() {
+    loadScript(CDN.lenis).then(function () {
+      if (!window.Lenis) return;
+      lenis = new window.Lenis({ lerp: 0.085, smoothWheel: true, wheelMultiplier: 1, anchors: true });
+    }).catch(function (err) { console.warn("Smooth scrolling unavailable.", err); });
+  }
+
+  // Desktop with motion allowed only. Phones and reduced motion use the stills.
+  function startScene() {
+    if (isPhone() || reduceMotion()) return;
+    startLenis();
+    startVideo();
+    requestAnimationFrame(tick);
+  }
+
+  /* ===================== OPENING ANIMATION ===================== */
+  var root = document.documentElement;
+  var openingAnims = [];
+  var opened = false;
+
+  function finishOpening() {
+    if (opened) return;
+    opened = true;
+    root.classList.remove("pre");
+    openingAnims.forEach(function (a) { try { a.cancel(); } catch (e) {} });
+    root.classList.add("ready");
+  }
+
+  function playOpening() {
+    var EASE = "cubic-bezier(.16,1,.3,1)";
+    function go(el, from, dur, delay) {
+      openingAnims.push(el.animate(from, { duration: dur, delay: delay, easing: EASE, fill: "backwards" }));
+    }
+    var i;
+    root.classList.remove("pre");
+
+    var chars = Array.prototype.slice.call(wordmark.querySelectorAll(".ch"));
+    chars.push(markEl);
+    for (i = 0; i < chars.length; i++) {
+      go(chars[i], [{ opacity: 0, transform: "translateY(60%) rotate(4deg)" }], 1100, 250 + i * 55);
+    }
+    var lines = hero.querySelectorAll(".copy .line > span");
+    for (i = 0; i < lines.length; i++) {
+      go(lines[i], [{ transform: "translateY(100%)" }], 900, 850 + i * 70);
+    }
+    go($(".tag"), [{ opacity: 0, transform: "translateX(-20px)" }], 900, 1300);
+
+    var navItems = document.querySelectorAll(".nav > :not(.logo)");
+    for (i = 0; i < navItems.length; i++) {
+      go(navItems[i], [{ opacity: 0, transform: "translateY(-24px)" }], 900, 500 + i * 80);
+    }
+    var barItems = document.querySelectorAll(".bar > *");
+    for (i = 0; i < barItems.length; i++) {
+      go(barItems[i], [{ opacity: 0, transform: "translateY(24px)" }], 900, 700 + i * 80);
+    }
+    // One-time star-burst: the dust layers swell in from nothing.
+    go($(".stardust"), [{ opacity: 0 }], 1400, 400);
+    go($(".stardust--far"), [{ opacity: 0 }], 1400, 400);
+
+    Promise.all(openingAnims.map(function (a) { return a.finished; }))
+      .then(finishOpening, finishOpening);
+  }
+
+  /* ===================== BOOT ===================== */
+  function boot() {
+    layout();
+    if (reduceMotion() || !document.documentElement.animate) {
+      finishOpening();
+    } else {
+      playOpening();
+    }
+  }
+
+  if (reduceMotion()) {
+    root.classList.remove("pre");
+  } else {
+    // Failsafes: reveal at 4 s, finish at 6 s, even if fonts never arrive.
+    setTimeout(function () { root.classList.remove("pre"); }, 4000);
+    setTimeout(finishOpening, 6000);
+  }
+
+  startScene();
+
+  var fontsReady = Promise.resolve();
+  if (document.fonts && document.fonts.load) {
+    fontsReady = Promise.all([
+      document.fonts.load("650 100px Archivo"),
+      document.fonts.load("600 30px Outfit")
+    ]).then(function () { return document.fonts.ready; });
+  }
+  fontsReady.then(boot, boot);
+
   updateScrollState();
 })();
 </script>
