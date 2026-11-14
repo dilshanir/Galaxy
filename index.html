@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Galaxy — Couture for the Cosmos</title>
-<meta name="description" content="Galaxy: fully 3D celestial couture characters, woven from nebulae and starlight.">
-<meta name="theme-color" content="#07061a">
+<title>Galaxy</title>
+<meta name="description" content="Galaxy: a fashion world of fully 3D characters and their looks.">
+<meta name="theme-color" content="#e4ddd3">
 
 <link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
 <noscript><style>html.pre .ch, html.pre .mark, html.pre .line > span, html.pre .tag, html.pre .nav > *, html.pre .bar > * { opacity: 1 !important; }</style></noscript>
@@ -30,13 +30,14 @@
 
 /* ============ TOKENS ============ */
 :root {
-  --bg: #07061a;
-  --ink: #f4efe6;
-  --mute: #8f8aa8;
-  --pill: rgba(255,255,255,.08);
-  --line: rgba(244,239,230,.16);
+  --bg: #e4ddd3;               /* sampled from the video's studio backdrop */
+  --ink: #17131f;
+  --mute: #5f596f;
+  --pill: rgba(23,19,31,.06);
+  --line: rgba(23,19,31,.18);
   --accent: #ffc857;
-  --aurora: linear-gradient(120deg,#7c5cff,#ff6ad5,#2de2c8);
+  --accent-ink: #8f5f00;       /* gold dark enough to read as text on the light backdrop */
+  --glow: linear-gradient(120deg,#ffc857,#ef6a2a);
 
   /* Scaling system. --vw is set by JS: clientWidth / 1440 (a plain number).
      u = frame unit, n = nav/footer unit. Use calc(53 * var(--u)) etc. */
@@ -53,7 +54,7 @@
 
 /* ============ BASE ============ */
 *, *::before, *::after { box-sizing: border-box; }
-html { background: var(--bg); color-scheme: dark; }
+html { background: var(--bg); color-scheme: light; }
 body {
   margin: 0;
   min-height: 100svh;
@@ -70,61 +71,17 @@ button { font: inherit; color: inherit; }
 
 /* ============ GLOBAL LAYERS ============ */
 
-/* Nebula glow: behind content, slowly breathing */
-.nebula {
-  position: fixed;
-  inset: -10vmax;
-  z-index: 0;
-  pointer-events: none;
-  filter: blur(80px);
-  background:
-    radial-gradient(40% 36% at 22% 30%, rgba(124,92,255,.12), transparent 70%),
-    radial-gradient(42% 38% at 78% 68%, rgba(255,106,213,.12), transparent 70%),
-    radial-gradient(30% 30% at 60% 20%, rgba(45,226,200,.06), transparent 70%);
-  animation: breathe 14s ease-in-out infinite;
-}
-@keyframes breathe {
-  0%, 100% { opacity: .55; transform: scale(1); }
-  50%      { opacity: 1;   transform: scale(1.08); }
-}
-
 /* Vignette */
 .vignette {
   position: fixed;
   inset: 0;
   z-index: 59;
   pointer-events: none;
-  box-shadow: inset 0 0 240px 20px rgba(0,0,12,.55);
+  box-shadow: inset 0 0 240px 20px rgba(60,48,70,.22);
 }
-
-/* Star dust: two tiles drifting diagonally at different speeds (parallax).
-   Tiles are feTurbulence fractalNoise thresholded through feColorMatrix. */
-.stardust, .stardust--far {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-  mix-blend-mode: screen;
-  background-repeat: repeat;
-}
-.stardust {
-  opacity: .5;
-  background-size: 240px 240px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='1' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .96 0 0 0 0 .94 0 0 0 0 .9 34 0 0 0 -26.8'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23f)'/%3E%3C/svg%3E");
-  animation: drift 40s linear infinite;
-}
-.stardust--far {
-  opacity: .32;
-  background-size: 360px 360px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.42' numOctaves='1' seed='23' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .86 0 0 0 0 .6 34 0 0 0 -26'/%3E%3C/filter%3E%3Crect width='360' height='360' filter='url(%23g)'/%3E%3C/svg%3E");
-  animation: drift-far 90s linear infinite;
-}
-/* The tile sizes match the translation distance, so the loop is seamless. */
-@keyframes drift     { to { background-position: 240px 240px; } }
-@keyframes drift-far { to { background-position: -360px 360px; } }
 
 /* ============ STEP 2: SHARED PILL / FOCUS ============ */
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
 
 .pill {
   display: inline-flex;
@@ -146,7 +103,7 @@ button { font: inherit; color: inherit; }
   cursor: pointer;
   transition: opacity .5s, transform .6s cubic-bezier(.16,1,.3,1), background-color .3s;
 }
-.pill:hover { background-color: rgba(255,255,255,.13); }
+.pill:hover { background-color: rgba(23,19,31,.11); }
 .pill__dot {
   flex: none;
   display: grid;
@@ -155,10 +112,10 @@ button { font: inherit; color: inherit; }
   height: calc(32 * var(--n));
   border-radius: 50%;
   background: var(--accent);
-  color: var(--bg);
+  color: var(--ink);
   transition: transform .6s cubic-bezier(.16,1,.3,1);
 }
-.pill:hover .pill__dot { transform: rotate(90deg); background: var(--aurora); }
+.pill:hover .pill__dot { transform: rotate(90deg); background: var(--glow); }
 .pill__dot svg { width: calc(12 * var(--n)); height: calc(12 * var(--n)); display: block; }
 
 /* ============ STEP 2: TOP NAV ============ */
@@ -174,7 +131,7 @@ button { font: inherit; color: inherit; }
 .pill--watch { left: calc(53 * var(--n)); top: calc(8 * var(--n)); width: calc(178 * var(--n)); }
 .pill--enter { right: calc(127 * var(--n)); top: calc(8 * var(--n)); }
 .nav__label {
-  left: calc(463 * var(--n));
+  left: 0; right: 0; text-align: center; pointer-events: none;
   top: calc(22 * var(--n));
   font-size: calc(14.5 * var(--n));
   font-weight: 600;
@@ -240,7 +197,7 @@ body.scrolled .nav__label {
   display: grid;
   align-content: center;
   padding: 0 calc(53 * var(--n));
-  background: rgba(7,6,26,.88);
+  background: rgba(228,221,211,.9);
   -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
   opacity: 0;
@@ -270,7 +227,7 @@ body.scrolled .nav__label {
               transform .9s calc(var(--i) * 80ms + 120ms) cubic-bezier(.16,1,.3,1),
               color .3s;
 }
-.menu a:hover { color: var(--accent); }
+.menu a:hover { color: var(--accent-ink); }
 .menu__num { font-size: .18em; font-weight: 600; letter-spacing: .2em; color: var(--mute); }
 html.menu-open { overflow: hidden; }
 
@@ -314,7 +271,7 @@ body.bar-off .bar > * { pointer-events: none; }
   cursor: pointer;
   transition: transform .4s cubic-bezier(.16,1,.3,1), background-color .3s;
 }
-.icon-btn:hover { background-color: rgba(255,255,255,.13); transform: rotate(-8deg) scale(1.05); }
+.icon-btn:hover { background-color: rgba(23,19,31,.11); transform: rotate(-8deg) scale(1.05); }
 .icon-btn svg { width: calc(26 * var(--n)); height: calc(26 * var(--n)); }
 
 .switch {
@@ -339,10 +296,10 @@ body.bar-off .bar > * { pointer-events: none; }
   text-transform: uppercase;
   font-size: calc(12 * var(--n));
   cursor: pointer;
-  box-shadow: 0 calc(3 * var(--n)) 0 #a39c8d;
+  box-shadow: 0 calc(3 * var(--n)) 0 #05030a;
   transition: transform .08s, box-shadow .08s;
 }
-.key:active, .key.is-pressed { transform: translateY(calc(3 * var(--n))); box-shadow: 0 0 0 #a39c8d; }
+.key:active, .key.is-pressed { transform: translateY(calc(3 * var(--n))); box-shadow: 0 0 0 #05030a; }
 
 .link-index {
   position: relative;
@@ -358,7 +315,7 @@ body.bar-off .bar > * { pointer-events: none; }
   position: absolute;
   left: 0; right: 0; bottom: 0;
   height: 1px;
-  background: var(--accent);
+  background: var(--accent-ink);
   transform: scaleX(0);
   transform-origin: right;
   transition: transform .5s cubic-bezier(.16,1,.3,1);
@@ -418,9 +375,9 @@ html.pre .nav > :not(.logo), html.pre .bar > * { opacity: 0; }
   will-change: transform;
 }
 .ch { display: inline-block; }
-/* Very subtle aurora tint on hover only */
+/* Very subtle warm tint on hover only */
 .wordmark:hover .ch {
-  background-image: linear-gradient(120deg, #f4efe6 0%, #d6caff 30%, #ffd0f0 55%, #c4f6ec 80%, #f4efe6 100%);
+  background-image: linear-gradient(120deg, #17131f 0%, #6b4300 50%, #17131f 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -486,7 +443,7 @@ html.pre .nav > :not(.logo), html.pre .bar > * { opacity: 0; }
   width: calc(64 * var(--u));
   height: calc(40 * var(--u));
   fill: none;
-  stroke: var(--accent);
+  stroke: var(--accent-ink);
   stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -585,8 +542,21 @@ html.lenis, html.lenis body { height: auto; }
   object-fit: cover;
   object-position: 50% 50%;
 }
+.story-backdrop { display: none; }
 @media (prefers-reduced-motion: reduce) {
-  .story-still { display: block; position: absolute; inset: 0; z-index: -1; }
+  .story-still { display: block; position: absolute; inset: 0; z-index: -1; object-fit: contain; }
+  .story-backdrop {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(36px) saturate(1.1);
+    transform: scale(1.15);
+    opacity: .6;
+  }
 }
 
 .panel {
@@ -625,10 +595,10 @@ html.lenis, html.lenis body { height: auto; }
   margin: calc(24 * var(--u)) 0 0;
   font-size: calc(15.5 * var(--u));
   line-height: 1.55;
-  color: rgba(244,239,230,.86);
+  color: rgba(23,19,31,.86);
   transform: translateY(calc((1 - var(--e, 0)) * 24px));
 }
-.gold { color: var(--accent); }
+.gold { color: var(--accent-ink); }
 
 .dashes {
   position: absolute;
@@ -651,7 +621,7 @@ html.lenis, html.lenis body { height: auto; }
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--accent);
+  background: var(--accent-ink);
   transform: scaleX(var(--f, 0));
   transform-origin: left;
 }
@@ -668,10 +638,12 @@ html.lenis, html.lenis body { height: auto; }
   }
   .panel__label, .panel__text, .panel__title .hl > span { transform: none; }
   .dashes { display: none; }
+  .story-backdrop { display: none; }
   .story-still {
     display: block;
     position: static;
     z-index: auto;
+    object-fit: cover;
     width: calc(100% + 32 * var(--u));
     height: calc(520 * var(--u));
     margin: 0 calc(-16 * var(--u));
@@ -685,7 +657,7 @@ html.lenis, html.lenis body { height: auto; }
   position: relative;
   z-index: 1;
   padding-top: calc(56 * var(--n));
-  background: linear-gradient(180deg, #07061a 0%, #0d0a28 60%, #140f33 100%);
+  background: linear-gradient(180deg, #e4ddd3 0%, #d9d1c6 60%, #cfc6ba 100%);
 }
 .partners__head { padding: 0 calc(50 * var(--n)); }
 .partners__label {
@@ -729,14 +701,14 @@ html.lenis, html.lenis body { height: auto; }
   border-radius: calc(14 * var(--n));
   outline-offset: 4px;
 }
-/* Soft aurora edge glow, only on hover / focus */
+/* Soft edge glow, only on hover / focus */
 .card::before {
   content: "";
   position: absolute;
   inset: -2px;
   z-index: -1;
   border-radius: inherit;
-  background: var(--aurora);
+  background: var(--glow);
   filter: blur(14px);
   opacity: 0;
   transition: opacity .5s;
@@ -747,13 +719,13 @@ html.lenis, html.lenis body { height: auto; }
   inset: 0;
   overflow: hidden;
   border-radius: inherit;
-  background: #0b0920;
+  background: #cfc6ba;
 }
 .card__art {
   position: absolute;
   inset: 0;
-  background-color: #140f33;
-  background-image: linear-gradient(160deg, #2a1d63 0%, #0b0920 75%);
+  background-color: #cfc6ba;
+  background-image: linear-gradient(160deg, #ebe4da 0%, #c9bfb2 75%);
   background-size: 304.9% 203.25%;
   background-repeat: no-repeat;
   filter: grayscale(.85);
@@ -768,7 +740,7 @@ html.lenis, html.lenis body { height: auto; }
   flex-direction: column;
   gap: calc(3 * var(--n));
   padding: calc(34 * var(--n)) calc(14 * var(--n)) calc(12 * var(--n));
-  background: linear-gradient(transparent, rgba(7,6,26,.88));
+  background: linear-gradient(transparent, rgba(228,221,211,.94));
   transform: translateY(101%);
   transition: transform .6s cubic-bezier(.16,1,.3,1);
 }
@@ -786,7 +758,7 @@ html.lenis, html.lenis body { height: auto; }
 .progress i {
   display: block;
   height: 100%;
-  background: var(--aurora);
+  background: var(--glow);
   transform: scaleX(0);
   transform-origin: left;
 }
@@ -828,7 +800,7 @@ html.lenis, html.lenis body { height: auto; }
 .footer__links { display: grid; grid-template-columns: 1fr 1fr; gap: calc(24 * var(--n)); }
 .footer__links ul { margin: 0; padding: 0; list-style: none; display: grid; gap: calc(12 * var(--n)); align-content: start; }
 .footer__links a { font-size: calc(14 * var(--n)); font-weight: 600; transition: color .3s; }
-.footer a:hover { color: var(--accent); }
+.footer a:hover { color: var(--accent-ink); }
 
 .legal {
   display: flex;
@@ -879,10 +851,7 @@ html.lenis, html.lenis body { height: auto; }
 </head>
 
 <body>
-<div class="nebula" aria-hidden="true"></div>
 <div class="vignette" aria-hidden="true"></div>
-<div class="stardust--far" aria-hidden="true"></div>
-<div class="stardust" aria-hidden="true"></div>
 
 <!-- ============ TOP NAV ============ -->
 <header class="nav">
@@ -895,10 +864,10 @@ html.lenis, html.lenis body { height: auto; }
     </span>
   </a>
 
-  <div class="nav__label">Galaxy · Couture for the Cosmos</div>
+  <div class="nav__label">Galaxy</div>
 
   <a class="pill pill--enter" href="#partners">
-    <span>Enter the Constellations</span>
+    <span>See the looks</span>
     <span class="pill__dot" aria-hidden="true">
       <svg viewBox="0 0 12 12"><rect x="2.6" y="2" width="2.4" height="8" rx=".6" fill="currentColor"/><rect x="7" y="2" width="2.4" height="8" rx=".6" fill="currentColor"/></svg>
     </span>
@@ -911,9 +880,9 @@ html.lenis, html.lenis body { height: auto; }
 
 <!-- ============ MENU OVERLAY ============ -->
 <nav class="menu" id="menu" aria-label="Main menu" inert>
-  <a href="#top" style="--i:0"><span class="menu__num">01</span><span>The Collection</span></a>
+  <a href="#top" style="--i:0"><span class="menu__num">01</span><span>Home</span></a>
   <a href="#walk" style="--i:1"><span class="menu__num">02</span><span>The Runway</span></a>
-  <a href="#partners" style="--i:2"><span class="menu__num">03</span><span>Constellations</span></a>
+  <a href="#partners" style="--i:2"><span class="menu__num">03</span><span>The Looks</span></a>
 </nav>
 
 <!-- ============ BOTTOM BAR ============ -->
@@ -924,23 +893,23 @@ html.lenis, html.lenis body { height: auto; }
       <circle cx="20" cy="20" r="3.2"/>
       <path d="M9 7.5c6 .5 1 11 8 11.2"/>
     </svg>
-    <span>Galaxy Roadmap</span>
+    <span>The Story</span>
   </a>
 
   <button class="icon-btn" type="button" id="randomLook" aria-label="Random Galaxy look">
     <svg viewBox="0 0 26 26" fill="none" aria-hidden="true">
-      <path d="M4 3.5l5.4 5h7.2l5.4-5v9.2c0 5.4-4 9.3-9 9.3s-9-3.900-9-9.300z" stroke="#f4efe6" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M4 3.5l5.4 5h7.2l5.4-5v9.2c0 5.4-4 9.3-9 9.3s-9-3.900-9-9.300z" stroke="#17131f" stroke-width="1.5" stroke-linejoin="round"/>
       <path d="M6.600 12.800c1.700 2.600 11.100 2.600 12.800 0-1.700-1.800-11.100-1.800-12.800 0z" fill="#ffc857"/>
     </svg>
   </button>
 
   <div class="switch">
     <span>Press</span>
-    <button class="key" type="button" id="orbitKey" aria-label="Orbit: jump to the next stop">Orbit</button>
+    <button class="key" type="button" id="orbitKey" aria-label="Next: jump to the next stop">Next</button>
     <span>to switch</span>
   </div>
 
-  <a class="link-index" href="#partners">Galaxy Index ↗</a>
+  <a class="link-index" href="#partners">All looks ↗</a>
 
   <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
 </nav>
@@ -960,17 +929,17 @@ html.lenis, html.lenis body { height: auto; }
       <path d="M9 17.200V6.800h3.900a3.100 3.100 0 0 1 0 6.200H9M12.800 13l2.800 4.200"/>
     </svg>
   </h1>
-  <p class="tagline">— Couture for the Cosmos —</p>
+  <p class="tagline" aria-hidden="true"></p>
 
   <div class="copy copy--1">
-    <span class="line line--strong"><span>Galaxy is woven from starlight,</span></span>
-    <span class="line"><span>tailored for the dark,</span></span>
+    <span class="line line--strong"><span>Galaxy is made by hand,</span></span>
+    <span class="line"><span>tailored for the bold,</span></span>
     <span class="line"><span>ready to wear</span></span>
   </div>
   <div class="copy copy--2">
     <span class="line"><span>Meet all</span></span>
     <span class="line"><span>8888 Galaxy-stitched</span></span>
-    <span class="line"><span>Big-eared celestials</span></span>
+    <span class="line"><span>Big-eared characters</span></span>
   </div>
 
   <div class="tag">
@@ -984,15 +953,16 @@ html.lenis, html.lenis body { height: auto; }
 <!-- ============ STORY ============ -->
 <section class="story" id="walk" aria-label="The story">
   <div class="story__frame">
+    <img class="story-backdrop" alt="" decoding="async" aria-hidden="true">
     <img class="story-still" alt="" decoding="async" width="2048" height="1360">
 
     <article class="panel panel--1" id="panel1">
       <p class="panel__label">01 /</p>
       <h2 class="panel__title">
         <span class="hl" style="--k:0"><span>Wear the</span></span>
-        <span class="hl" style="--k:1"><span>Night sky</span></span>
+        <span class="hl" style="--k:1"><span>Look</span></span>
       </h2>
-      <p class="panel__text">Slip into limited Galaxy drops stitched with real constellations. Climb the Galaxy Index, collect <span class="gold">rare star-charts</span> and design a silhouette that glows in every world.</p>
+      <p class="panel__text">Slip into limited Galaxy drops stitched by hand. Climb the Galaxy Index, collect <span class="gold">rare pieces</span> and design a silhouette that stands out in every world.</p>
     </article>
 
     <article class="panel panel--2" id="panel2">
@@ -1001,7 +971,7 @@ html.lenis, html.lenis body { height: auto; }
         <span class="hl" style="--k:0"><span>Own the</span></span>
         <span class="hl" style="--k:1"><span>Runway</span></span>
       </h2>
-      <p class="panel__text">Step onto Galaxy's orbit-lit catwalk and unfold the whole wardrobe. Become a <span class="gold">CELESTIAL ICON</span> and unlock real-world perks.</p>
+      <p class="panel__text">Step onto Galaxy's catwalk and unfold the whole wardrobe. Become a <span class="gold">GALAXY ICON</span> and unlock real-world perks.</p>
     </article>
 
     <div class="dashes" aria-hidden="true"><span class="dash" id="dash1"></span><span class="dash" id="dash2"></span></div>
@@ -1012,17 +982,17 @@ html.lenis, html.lenis body { height: auto; }
 <section class="partners" id="partners" aria-labelledby="partnersTitle">
   <div class="partners__head">
     <p class="partners__label">03 /</p>
-    <h2 class="partners__title" id="partnersTitle">Galaxy<br>Constellations</h2>
+    <h2 class="partners__title" id="partnersTitle">Galaxy<br>Looks</h2>
   </div>
 
-  <div class="track" id="track" tabindex="0" role="region" aria-label="Galaxy constellations, scrollable"></div>
+  <div class="track" id="track" tabindex="0" role="region" aria-label="Galaxy looks, scrollable"></div>
   <div class="progress" aria-hidden="true"><i id="progFill"></i></div>
 
   <footer class="footer">
     <div class="footer__top">
       <div class="footer__quote-wrap">
-        <p class="footer__quote">We stitch, we shine,<br>we orbit. we rise.</p>
-        <p>Galaxy Atelier Manifest</p>
+        <p class="footer__quote">We stitch, we shine,<br>we style. we rise.</p>
+        <p>Galaxy Manifest</p>
       </div>
       <h2 class="footer__connect">Connect<br>with<br>Galaxy</h2>
       <div class="footer__links">
@@ -1035,7 +1005,7 @@ html.lenis, html.lenis body { height: auto; }
         <ul>
           <li><a href="#" data-todo>The Galaxy Journal ↗</a></li>
           <li><a href="#" data-todo>Drops ↗</a></li>
-          <li><a href="#" data-todo>Observatory Studio ↗</a></li>
+          <li><a href="#" data-todo>Galaxy Studio ↗</a></li>
         </ul>
       </div>
     </div>
@@ -1191,11 +1161,12 @@ html.lenis, html.lenis body { height: auto; }
   /* ===================== HERO ===================== */
   // Asset placeholders. Replace each {{...}} with a real URL. A value that still
   // contains "{{" is never requested.
+  // The still URLs carry a `w` parameter; stillWidth() replaces it at load time.
   var ASSETS = {
-    video: "{{VIDEO_URL}}",
-    heroStill: "{{HERO_STILL}}",
-    storyStill: "{{STORY_STILL}}",
-    partnerSheet: "{{PARTNER_SHEET}}"
+    video: "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261107_145142_a39216fc-13cf-4ce3-baf8-d9bdbfd5f955.mp4",
+    heroStill: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261107_005547_8a9e6889-76aa-4688-81b5-4452d9afa4ad.png&w=2048&q=85",
+    storyStill: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261107_005547_a3e2027b-0bcb-455d-bef4-6c0c6d722cb1.png&w=2048&q=85",
+    partnerSheet: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261107_005542_4250aa05-1091-4015-b242-d58db718f6b7.png&w=2000&q=85"
   };
 
   var hero = $(".hero");
@@ -1213,15 +1184,24 @@ html.lenis, html.lenis body { height: auto; }
     w = Math.round(w / 64) * 64;
     return Math.max(1024, Math.min(2048, w));
   }
-  function setStill(img, base) {
+  function withWidth(base, w) {
+    var re = /([?&])w=\d+/;
+    return re.test(base) ? base.replace(re, "$1w=" + w)
+                         : base + (base.indexOf("?") === -1 ? "?" : "&") + "w=" + w;
+  }
+  function setStill(img, base, width) {
     if (!img || img.getAttribute("src")) return;
     if (!base || base.indexOf("{{") !== -1) return;
-    img.src = base + (base.indexOf("?") === -1 ? "?" : "&") + "w=" + stillWidth();
+    img.src = withWidth(base, width || stillWidth());
   }
   function maybeLoadStills() {
     if (isPhone() || reduceMotion()) {
       setStill(heroStill, ASSETS.heroStill);
       setStill($(".story-still"), ASSETS.storyStill);
+    }
+    // Reduced motion on a wide screen: a small, blurred copy of the story still fills the sides.
+    if (reduceMotion() && !isPhone()) {
+      setStill($(".story-backdrop"), ASSETS.storyStill, 480);
     }
   }
 
@@ -1330,12 +1310,12 @@ html.lenis, html.lenis body { height: auto; }
   });
 
   var PARTNERS = [
-    { name: "Lunaris",      type: "Puffer",    col: 0, row: 0 },
-    { name: "Umbra Hare",   type: "Leather",   col: 1, row: 0 },
-    { name: "Comet & Co",   type: "Bomber",    col: 2, row: 0 },
-    { name: "Eclipse Hoot", type: "Tailoring", col: 0, row: 1 },
-    { name: "Axo Aurora",   type: "Tech",      col: 1, row: 1 },
-    { name: "Spiral Knit",  type: "Knitwear",  col: 2, row: 1 }
+    { name: "Snow Leopard", type: "Puffer",    col: 0, row: 0 },
+    { name: "Hare",         type: "Leather",   col: 1, row: 0 },
+    { name: "Raccoon",      type: "Bomber",    col: 2, row: 0 },
+    { name: "Owl",         type: "Tailoring", col: 0, row: 1 },
+    { name: "Axolotl",      type: "Tech",      col: 1, row: 1 },
+    { name: "Red Panda",    type: "Knitwear",  col: 2, row: 1 }
   ];
   var SHEET_X = [0.15, 50.07, 99.94];
   var SHEET_Y = [0.2, 99.7];
@@ -1584,7 +1564,7 @@ html.lenis, html.lenis body { height: auto; }
     var x = x0 + (x1 - x0) * t, w = w0 + (w1 - w0) * t, h = h0 + (h1 - h0) * t;
 
     g.globalAlpha = 1;
-    g.fillStyle = "#07061a";
+    g.fillStyle = "#e4ddd3";
     g.fillRect(0, 0, W, H);
 
     var a = nearestBitmap(i);
@@ -1896,9 +1876,6 @@ html.lenis, html.lenis body { height: auto; }
     for (i = 0; i < barItems.length; i++) {
       go(barItems[i], [{ opacity: 0, transform: "translateY(24px)" }], 900, 700 + i * 80);
     }
-    // One-time star-burst: the dust layers swell in from nothing.
-    go($(".stardust"), [{ opacity: 0 }], 1400, 400);
-    go($(".stardust--far"), [{ opacity: 0 }], 1400, 400);
 
     Promise.all(openingAnims.map(function (a) { return a.finished; }))
       .then(finishOpening, finishOpening);
